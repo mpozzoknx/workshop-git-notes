@@ -64,148 +64,117 @@ git commit
 
 * Todos los archivos modificados que se quieran commitear deben ser agregados al área de staging
 * Ya que los archivos agregados son puestos en el área de staging `add` es sinónimo de `staging`
-    All modified files should be added before calling git commit
-    Since the added files are staged for commit, the command git stage is a synonym for git add'
-    making use of the git status output
-    using a .gitignore file
-    adding a Sign-off (AKA S-O-B)
-    git init creates .git/ in which all of the repository's files live
-    git config accesses .git/config, ~/.gitconfig and /etc/gitconfig
 
-What are diffs?
 
-Before committing, it is a good idea to see what modifications are about to be committed. One mode to look at them is to let Git show a diff. A diff consists of the following parts for every modified file:
+#### status
+```
+git status
+```
 
-    a pseudo command line starting with diff --git
-    a line describing the previous revision, starting with ---
-    a line describing the next revision, starting with +++
-    one or more hunks starting with @@ -<begin line>,<line count> +<begin line>,<line count>
-    a corresponding block of lines starting with a space for lines in both the previous and next revision, a minus for lines only in the previous one (removed line) and a plus for lines only in the next revision (added line). A modified line will show up as removed and added.
 
-Hands-on
+#### .gitignore    
 
-    Looking at a diff:
 
-?
-1
+#### gitconfig
+
+
+#### diffs
+
+Antes de commitear es una buena idea ver las modificaciones que se estan por persistir. Una forma de verlo es pedirle a git que nos muestra un diff
+Un diff consiste en las siguientes partes para cada archivo modificado
+
+1. una pseudo linea de comando que comienza con `diff --git`
+1. una linea describiendo la revisión anterior que comienza con `---`
+1. una linea describiendo la próxima revisión que comienza con `+++`
+1. varios bloques que empiezan con `@@ -<begin line>,<line count> +<begin line>,<line count>`
+1. un bloque de lineas que empiezan con un espacio en las lineas iguales en ambas revisiones, un `-` en lineas de la revisión anterior y un `+` en las lineas de la nueva revisión
+
+##### Tareas:
+
+###### Generar y visualizar un cambio
+
+` git diff `
+
+###### ver el diff en colores
+
+` git diff --color `
+
+
+### Detalles internos
+
+* Todo es un objeto
+* Todo objeto tiene un tipo
+* Todo objeto tiene un nombre que es calculado como una function hash, SHA-1, a partir del tipo y los contenidos. Es un número de 40 dígitos
+* Todos los objetos son inmutables (cambiar algo cambia el nombre/hash)
+* Archivos son guardados como `blobs`
+* Los directorios son guardados como arboles
+* Las revisiones son guardadas como commits
+
+Para simplificar el uso, ademas del nombre largo, el hash de 40 caracteres, los commits se pueden referenciar como:
+* nombre corto
+* HEAD
+* HEAD~<n>
+
+
+##### Tareas:
+
+######  Inspeccionar la historia
     
-git diff
+` git log `
 
-    Looking at a diff in color:
+######  Inspeccionar la historia de manear gráfica
 
-?
-1
+` gitk `
+
+######  Inspeccionar la historia con diffs
+
+` git log -p `
+
+######  Inspeccionar los últimos 5 commits de la historia con diffs
     
-git diff --color
+` git log -p -5 `
 
-    Changing the default to color diffs:
-
-?
-1
-    
-git config --global diff.color auto
-A word on the data model of Git (and how to reference objects)
-
-See Git for computer scientists.
-
-    Everything is an object
-    Every object has a type
-    Every object has a name that is calculated by a one-way function (the hash function SHA-1) from the type and the contents
-    It is a 40-digit hex number
-    Every object is immutable (changing something changes the name).
-    Plain files are encoded as blobs
-    Directories are encoded as trees
-    Revisions are encoded as commits
-
-For ease of use, in addition to their long name (40 hex characters, quite klunky but precise) commits can be referred to by
-
-    short name
-    HEAD
-    HEAD~<n>
-
-Hands-on
-
-    Inspecting the version history
-
-?
-1
-    
-git log
-
-    Inspecting the version history in a graphical way
-
-?
-1
-    
-gitk
-
-    Inspecting the version history with diffs
-
-?
-1
-    
-git log -p
-
-    Inspecting the latest 5 revisions with diffs
-
-?
-1
-    
-git log -p -5
-
-    Inspecting just one commit
-
-?
-1
+######  Inspeccionar un commit especifico
     
 git show HEAD~5
 
-    Looking at all commits touching a specific set of files/directories
-
-?
-1
+######  Inspeccionar commits que afectan un o mas archivos
     
-git log README
+` git log README `
 
-Note: to disambiguate between start commit and files, put a -- between commit and/or options and files/directories, e.g. git log HEAD -5 -- doc
-What are branches? Why do I need them?
+Para que no haya ambigüedades a la hora de definir los archivos sobre los cuales vamos a operar, usamos `--` antes de los nombres.
 
-A branch is a named pointer into the commit graph. The main branch is called 'master' (Subversion's trunk, Mercurial's default). Since branches are just pointers, they are very easily created.
+` git log HEAD -5 -- doc `
 
-Committing while on a branch advances that pointer (if you need something that cannot advance, you need to use tags).
+## Ramas
 
-Note: branch names must be simple, i.e. not contain spaces or wild characters (although minus & underscore is okay).
+Qué son las ramas y por qué las necesitamos.
 
-Branches can be used to organize sets of changes by topic. Compare also Fiji's tutorial on topic branches.
-Hands-on
+Una rama es un puntero con nombre en el gráfico de commits. La rama principal se llama `master`. Ya que son punteros, son creadas muy fácilmente.
 
-    Creating a branch
+Cuando hacemos un commit en una rama, avanza ese puntero, si necesitamos identificar un commit especifico, podemos usar un `tag`. Los nombre de las ramas deben ser relativamente simples, ya que no pueden contener espacios o caracteres raros.
 
-?
-1
-    
-git checkout -b my-new-branch
+Las ramas se usan para organizar cambios por tópicos.
 
-    Switching to another branch
+###### Crear una rama
 
-?
-1
-    
-git checkout master
+` git checkout -b my-new-branch `
 
-    Seeing all (local) branches (the current one is prefixed by a star)
+###### Cambiar a otra rama
 
-?
-1
-    
-git branch
+` git checkout master `
 
-    Switching back to the previous branch
+###### Ver ramas locales
 
-?
-1
-    
-git checkout @{-1}
+` git branch `
+
+###### Volver a la rama anterior
+
+` git checkout @{-1} `
+
+
+## Qué significa "Distribuido"
+
 What does "distributed" mean with regards to Git?
 
 So far, the repository is local to the working directory. But Git can also synchronize with multiple other repositories.
