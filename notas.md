@@ -175,294 +175,214 @@ Las ramas se usan para organizar cambios por tópicos.
 
 ## Qué significa "Distribuido"
 
-What does "distributed" mean with regards to Git?
+Hasta este punto el repositorio es local al directorio de trabajo. Git se puede sincronizar con otros repositorios.
 
-So far, the repository is local to the working directory. But Git can also synchronize with multiple other repositories.
+Normalmente hay un repositorio designado como principal. Si queres incializar uno en un directorios de trabajo, usa `git clone`. No es necesario que un repositorio tenga un directorios de trabajo, si este es el caso, se llaman `bare`.
 
-Typically, there is one designated main repository. If you want to initialize a working directory from a given repository, use git clone.
+###### Clonar un repositorios
 
-A main repository usually does not need a working directory, in which case it is called a bare repository.
-Hands-on
+` git clone git://github.com/git/hello-world `
 
-    Clone a repository
-
-?
-1
+###### Clonar un repositorio de un disco o file server
     
-git clone git://github.com/git/hello-world
+` git clone /path/to/hello-world `
 
-    Clone a repository from USB disk or file server
 
-?
-1
+###### Prepara un repo bare para usa compartido
+
+` git init --bare --shared=group /path/to/fileserver/my.git `
+
+## Merge
+
+Cuando se trabaja con otros, sus cambios (incluyendo toda la historia de commits) necesita ser integrada en otra rama. Este proceso se denonima `merge`.
+Para lograr esto, las versiones de los archivos son puestos en el area de staging (el `index`) y todos los cambios que no se pisen son resueltos automaticamente. Los cambios que se solapan no son resueltos, sino que se marcan como conflictos.
+
+
+###### Inicializar y commitear un archivo
     
-git clone /path/to/hello-world
-
-    Set up a main repository on the file server
-
-?
-1
-    
-git init --bare --shared=group /path/to/fileserver/my.git
-The merge concept of Git (and what is this "index" all about?)
-
-When working with others, or with topic branches, the changes (including their complete commit history) need to be integrated into another branch, typically master. This integration is called merging.
-
-In order to perform a merge, the file versions are put into a staging area (the index), and all non-overlapping changes are resolved automatically. Overlapping (read: contradicting) changes are not resolved, but marked as merge conflicts.
-
-Please refer to the Fiji's page on Git Conflicts for a detailed explanation how to resolve merge conflicts.
-Hands-on
-
-    Initialize and commit a file, say, hello.txt
-
-?
-1
-2
-3
-    
+```
 echo Hello > hello.txt
 git add hello.txt
 git commit -m initial
+```
 
-    Initialize a new branch and modify hello.txt
+###### Inicializar, una nueva rama y comitear
 
-?
-1
-2
-3
-4
-    
+```
 git checkout -b tut-anch-amun
 echo Boooh > hello.txt
 git add hello.txt
 git commit -m "On branch"
+```
 
-    Switch back to old branch, modify hello.txt
+###### Cambiar de rama y modificar el mismo archivo
 
-?
-1
-2
-3
-4
-    
+```
 git checkout @{-1}
 echo Hi > hello.txt
 git add hello.txt
 git commit -m "On original branch"
+```
 
-    Merge
+######  Merge
 
-?
-1
+` git merge tut-anch-amun `
+
+### Qué son los reflogs
+
+Cada repositorio tiene su propia historia. Esto se guarda en `reflogs`, los cuales son eliminados periódicamente, pero pueden ser útiles.
+Los reflogs se pueden acceder agregar `@{numero}` o `@{fecha}` a un nombre de rama o `HEAD`
+
+###### Ver como estaba la revisión hace 5 minutos
     
-git merge tut-anch-amun
-What are reflogs? How can they help me?
+` git show HEAD@{5.minutes.ago} `
 
-We looked at the commit history previously. But every repository has its own individual history; for example, yesterday at noon, a specific branch with a specific revision was the current branch. This is stored in the reflogs (for space efficiency, reflogs are not available eternally but are pruned at some stage).
+###### Ver la historia de reflog
 
-You can access the reflogs by appending @{<number>} or @{<date>} to a branch name or to HEAD.
-Hands-on
+` git log -g `
 
-    See what revision was current five minutes ago
 
-?
-1
+## Qué es el stash
+
+En algunos casos es necesario guardar las modificaciones y volver a un estado limpio, pero sin perder los cambios. Esto se logra usando el `stash`.
+
+El `stash` es una pseudo-rama especial. Su historia esta en el reflog.
+
+###### Hacer un cambio y crear un `stash`
     
-git show HEAD@{5.minutes.ago}
-
-    See the reflog history
-
-?
-1
-    
-git log -g
-What is the stash?
-
-Sometimes one needs to store away all modifications and go back to a clean state, but keep the modifications accessible. This is done using the stash.
-
-Note: the stash is a special pseudo-branch, living in refs/stash. Their history is in the reflog.
-Hands-on
-
-    Make a change and stash it
-
-?
-1
-2
-    
+```
 echo Shalom > hello.txt
 git stash
+```
 
-    Get it back
+###### Recuperarlo
 
-?
-1
+` git stash apply `
+
+###### Stash solo los cambios que no se hayan agregado a git todavia
     
-git stash apply
-
-    Stashing only the changes that have not been git added yet
-
-?
-1
-2
-3
-4
-    
+`
 echo Howdy > hello.txt
 git add hello.txt
 echo Hey hey > hello.txt
 git stash -k
+`
 
-    Getting a list of stashed changes
 
-?
-1
+###### Obtener una lista de cambios en el stash
     
-git stash list
 
-    Stash with a custom message
+` git stash list `
 
-?
-1
+
+###### Stash con un mensaje personalizado
     
-git stash save This is my description
+` git stash save This is my description `
 
-    Remove the latest changes from the stash
+###### Quitar el ultimo cambio del stash
 
-?
-1
     
-git stash pop
-Accessing parts of the object database
+` git stash pop `
 
-The primary way to look at commits is by using git show. It can show tags, commits, trees and blobs.
 
-To access more information about commits, use the parameter --pretty=fuller.
+## BBDD de objetos
 
-For more low-level access, use git cat-file.
-Hands-on
+La principal forma de ver los commits es usando `git show`. Puede mostrar `tags`, `commits`, `trees` y `blobs`.
 
-    Show the raw commit message, with the diff
+Para acceder a mas info de los commits, usar el parametro `--pretty=fuller`
 
-?
-1
+Para acceso de nivel mas bajo, usar `git cat-file`
+
+###### Mostrar el mensaje de commit con el diff
+
+` git show --pretty=raw HEAD `
+
+###### Mostrar el árbol de un commit
+
+` git show HEAD: `
+
+###### Mostrar un blob
     
-git show --pretty=raw HEAD
+` git show HEAD:Documentation/README `
 
-    Show a commit's corresponding top-level tree
+###### Acceso de bajo nivel a un commit  
 
-?
-1
+` git cat-file commit HEAD `
+
+## Checkout y Reset
+
+Checkout permite cambiar entre ramas e inicializar nuevas.
+
+Desafortunadamente, checkout también es el comando para recuperar una versión de archivo de otra rama, sin cambiarla. Estos archivos son automáticamente agregados al `stage` para ser commiteados.
+
+Para quitar los cambios del área de staging, se puede usar el comando `reset`. Sin argumentos, resetea todos los archivos que git concoce.
+
+El comando `reset` también se puede usar para resetear el área de trabajo
+
+###### Buscar una versión de un archi de otra rama
+
+` git checkout other-branch README `
+
+
+###### Quitar del stage todos los cambios
+
+Revierte todo los cambios listos para ser commiteados al estado `modificado`
+
+` git reset `
+
+
+###### Eliminar todos los cambios
+
+Funciona como `stash`, pero no se guardan, los cambios se pierden
     
-git show HEAD:
+` git reset --hard `
 
-    Show a blob
 
-?
-1
+## Repositorios Remotos
+
+Ademas del repositorios clonado, otros repositorios puede ser enlazados, usando el comando `remote`. Esos repos son llamados repositorios remotos o `remotos`
+
+El repositorio del cual clonamos se denomina `origin`
+
+La interacción con el repositorio remoto se realiza usando:
+
+* `git fetch` que genera copias locales de las ramas del repositorio remoto, incluyendo todos los objetos requerido.
+* `git push` que actualiza el repositorio remoto con los cambios locales
+
+Las copias locales de las ramas remotas viven en un espacio de nombre especifico `refs/remotes/<name>`. Por ejemplo, la rama `master` del remoto llamado `origin` sera guardado en `refs/remotes/origin/master`. Para que no hay ambigüedades podemos referirnos como `origin/master` 
+
+A tener en cuenta, si tenemos un proyecto con multiples remotos y hacemos un `fetch` git lo va aplicar sin preocuparle cual es el origen.
+
+Hay un comando que resume el proceso de hacer `fetch` y `merge` para traer los cambios al repo local:`pull`  
+
+###### Agregar un remoto:
+
+` git remote add hello git://github.com/git/hello-world `
+
+###### Traer info de un remoto
+
+` git fetch hello `
+
+
+###### Listar copias locales de las ramas remotas
+
+` git branch -r `
+
+###### Push de una rama
+
+` git push origin master `
+
+
+###### Push de la rama actual
+
+` git push origin HEAD `
+
+
+###### Push de una rama con un nombre distinto del nombre local
     
-git show HEAD:Documentation/README
+` git push origin my-new-branch:master `
 
-    Low-level access to a commit
+###### Borrar una rama de repo remoto
 
-?
-1
-    
-git cat-file commit HEAD
-What meanings do "checkout", "reset" have in Git?
-
-We already saw that checkout can switch between branches and even initialize new branches.
-
-Unfortunately, checkout is also the command to pick file versions from other branches without switching the branches. Thusly picked file versions are automatically added, i.e. staged for the next commit.
-
-To unstage changes, one can use the reset command (without arguments, it resets all files which HEAD knows about currently).
-
-The reset command can further be convinced to reset not only the index (staging area), but also the working directory.
-Hands-on
-
-    pick a file version from another branch
-
-?
-1
-    
-git checkout other-branch README
-
-    Unstage all changes, i.e. revert all files from "to-be-committed" status to "modified"
-
-?
-1
-    
-git reset
-
-    Get rid of all changes (like git stash but the changes are not stored)
-
-?
-1
-    
-git reset --hard
-Git's concept of "remote repositories"
-
-In addition to the repository from which we cloned, other repositories can be linked, too, using the git remote command. Such repositories are called remote repositories or simply remotes.
-
-The repository from which we cloned is called origin.
-
-Interaction with remote repositories is performed using
-
-    git fetch, which local copies of the branches of the remote repository including all required objects (but being a bit clever about avoiding to get objects we have already) and
-    git push, which updates remote repositories' branches to the local branches' state.
-
-The local copies of remote branches live in a specific namespace, refs/remotes/<name>. For example, the master branch of the remote called origin will be stored in refs/remotes/origin/master. If unambiguous, it can be referred to as origin/master, too.
-
-Note: you need to make sure that you do not mix two different projects in the same working directory's repository. Git will happily fetch from wherever into your local repository, even if it does not make sense.
-
-Note: there is a shortcut for fetch & merge: pull. If you create a new branch from a local copy of a remote branch, you can even set it up such that git pull without further parameters will fetch from the correct remote and merge the correct branch: git checkout --track origin/cool-feature
-Hands-on
-
-    Add a remote
-
-?
-1
-    
-git remote add hello git://github.com/git/hello-world
-
-    Fetch from a remote
-
-?
-1
-    
-git fetch hello
-
-    Listing all local copies of the remotes' branches
-
-?
-1
-    
-git branch -r
-
-    Push a branch
-
-?
-1
-    
-git push origin master
-
-    Push the current branch
-
-?
-1
-    
-git push origin HEAD
-
-    Push to a branch with a name differing from the local name
-
-?
-1
-    
-git push origin my-new-branch:master
-
-    Delete a branch from a remote repository
-
-?
-1
-    
-git push --delete origin blabla-branch
+` git push --delete origin blabla-branch `
 
