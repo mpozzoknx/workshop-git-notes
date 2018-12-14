@@ -38,10 +38,34 @@ Por defecto Git usa como editor a vi, por lo que si lo queremos cambiar, podemos
 git config --global core.editor gedit
 ```
 
-# EXPLICAR AREAS
+### Crear claves ssh
+
+Esto no es parte de git, pero simplifica la tarea de autenticarse con los servidores remotos, como GitHub
+
+###### Creación clave ssh
+
+`ssh-keygen -t rsa -b 4096 -C "you@computer-name"`
+
+Una vez creada, se puede asociar al usuario creado en GitHub (Bitbucket, Gitlab, etc)
+
+## Áreas
+
+    Hay 3 áreas principales:
+
+##### Archivos sin trackear
+
+Son archivos que todavía no le dijimos a git que tiene que versionar.
+
+##### Área de trabajo
+
+Archivos que han sido modificados, pero que aun no fueron commiteados
+
+##### Área de staging
+
+Archivos modificados que han sido marcados para ir en el próximo commit.
 
 
-### Primeros Pasos
+## Primeros Pasos
 
 #### Init repo
 
@@ -51,45 +75,37 @@ git config --global core.editor gedit
 
 Agrega los archivos que indiquemos al área de `staging` para que este disponibles para el commit.
 
-    
-```
-git add hello-world.txt
-```
+` git add hola-mundo.txt `
 
 #### commit
 
-```
-git commit
-```
+` git commit `
 
 * Todos los archivos modificados que se quieran commitear deben ser agregados al área de staging
 * Ya que los archivos agregados son puestos en el área de staging `add` es sinónimo de `staging`
 
 
 #### status
-```
-git status
-```
+` git status `
 
 
 #### .gitignore    
 
+En el archivo `.gitignore` podemos poner nombres de archivos, directorios que queremos que git ignore a la hora mostrarnos el status o hacer operaciones.
 
-#### gitconfig
+Los archivos que ya se encuentran trackeados, van a seguir apareciendo, aun si los agregamos al gitignore.
 
 
-#### diffs
+## Diffs
 
 Antes de commitear es una buena idea ver las modificaciones que se estan por persistir. Una forma de verlo es pedirle a git que nos muestra un diff
-Un diff consiste en las siguientes partes para cada archivo modificado
+    Un diff consiste en las siguientes partes para cada archivo modificado
 
 1. una pseudo linea de comando que comienza con `diff --git`
 1. una linea describiendo la revisión anterior que comienza con `---`
 1. una linea describiendo la próxima revisión que comienza con `+++`
 1. varios bloques que empiezan con `@@ -<begin line>,<line count> +<begin line>,<line count>`
 1. un bloque de lineas que empiezan con un espacio en las lineas iguales en ambas revisiones, un `-` en lineas de la revisión anterior y un `+` en las lineas de la nueva revisión
-
-##### Tareas:
 
 ###### Generar y visualizar un cambio
 
@@ -116,10 +132,8 @@ Para simplificar el uso, ademas del nombre largo, el hash de 40 caracteres, los 
 * HEAD~<n>
 
 
-##### Tareas:
-
 ######  Inspeccionar la historia
-    
+
 ` git log `
 
 ######  Inspeccionar la historia de manear gráfica
@@ -131,15 +145,15 @@ Para simplificar el uso, ademas del nombre largo, el hash de 40 caracteres, los 
 ` git log -p `
 
 ######  Inspeccionar los últimos 5 commits de la historia con diffs
-    
+
 ` git log -p -5 `
 
 ######  Inspeccionar un commit especifico
-    
-git show HEAD~5
+
+` git show HEAD~5 `
 
 ######  Inspeccionar commits que afectan un o mas archivos
-    
+
 ` git log README `
 
 Para que no haya ambigüedades a la hora de definir los archivos sobre los cuales vamos a operar, usamos `--` antes de los nombres.
@@ -154,11 +168,13 @@ Una rama es un puntero con nombre en el gráfico de commits. La rama principal s
 
 Cuando hacemos un commit en una rama, avanza ese puntero, si necesitamos identificar un commit especifico, podemos usar un `tag`. Los nombre de las ramas deben ser relativamente simples, ya que no pueden contener espacios o caracteres raros.
 
-Las ramas se usan para organizar cambios por tópicos.
+Las ramas se usan para organizar cambios por tópicos o features a desarrollar. Permite que los cambios queden aislados hasta que estamos listos para mezclarlos con el código principal.
+
+Depende del flujo de trabajo elegido, pero en general las ramas dependen de los tickets o tareas a realizar.
 
 ###### Crear una rama
 
-` git checkout -b my-new-branch `
+` git checkout -b nueva-rama `
 
 ###### Cambiar a otra rama
 
@@ -184,7 +200,7 @@ Normalmente hay un repositorio designado como principal. Si queres incializar un
 ` git clone git://github.com/git/hello-world `
 
 ###### Clonar un repositorio de un disco o file server
-    
+
 ` git clone /path/to/hello-world `
 
 
@@ -199,7 +215,7 @@ Para lograr esto, las versiones de los archivos son puestos en el area de stagin
 
 
 ###### Inicializar y commitear un archivo
-    
+
 ```
 echo Hello > hello.txt
 git add hello.txt
@@ -226,7 +242,18 @@ git commit -m "On original branch"
 
 ######  Merge
 
-` git merge tut-anch-amun `
+` git merge otra-rama `
+
+
+#### Conflictos de merge
+
+Al crear un merge, podemos encontrarnos con conflictos, lineas que fueron modificadas en las ramas que queremos unificar.
+
+En este caso tenemos distintas estrategias que podemos usar. La mas común es abrir el archivo, corregir el problema, mezclando el codigo, agregando el archivo al area de staging y terminando el commit.
+
+
+## Rebase
+
 
 ### Qué son los reflogs
 
@@ -234,7 +261,7 @@ Cada repositorio tiene su propia historia. Esto se guarda en `reflogs`, los cual
 Los reflogs se pueden acceder agregar `@{numero}` o `@{fecha}` a un nombre de rama o `HEAD`
 
 ###### Ver como estaba la revisión hace 5 minutos
-    
+
 ` git show HEAD@{5.minutes.ago} `
 
 ###### Ver la historia de reflog
@@ -249,7 +276,7 @@ En algunos casos es necesario guardar las modificaciones y volver a un estado li
 El `stash` es una pseudo-rama especial. Su historia esta en el reflog.
 
 ###### Hacer un cambio y crear un `stash`
-    
+
 ```
 echo Shalom > hello.txt
 git stash
@@ -260,28 +287,28 @@ git stash
 ` git stash apply `
 
 ###### Stash solo los cambios que no se hayan agregado a git todavia
-    
-`
+
+```
 echo Howdy > hello.txt
 git add hello.txt
 echo Hey hey > hello.txt
 git stash -k
-`
+```
 
 
 ###### Obtener una lista de cambios en el stash
-    
+
 
 ` git stash list `
 
 
 ###### Stash con un mensaje personalizado
-    
+
 ` git stash save This is my description `
 
 ###### Quitar el ultimo cambio del stash
 
-    
+
 ` git stash pop `
 
 
@@ -302,7 +329,7 @@ Para acceso de nivel mas bajo, usar `git cat-file`
 ` git show HEAD: `
 
 ###### Mostrar un blob
-    
+
 ` git show HEAD:Documentation/README `
 
 ###### Acceso de bajo nivel a un commit  
@@ -334,7 +361,7 @@ Revierte todo los cambios listos para ser commiteados al estado `modificado`
 ###### Eliminar todos los cambios
 
 Funciona como `stash`, pero no se guardan, los cambios se pierden
-    
+
 ` git reset --hard `
 
 
@@ -379,10 +406,28 @@ Hay un comando que resume el proceso de hacer `fetch` y `merge` para traer los c
 
 
 ###### Push de una rama con un nombre distinto del nombre local
-    
+
 ` git push origin my-new-branch:master `
 
 ###### Borrar una rama de repo remoto
 
 ` git push --delete origin blabla-branch `
 
+
+## Tags
+
+Las etiquetas o `tags` nos permiten marcar un commit especifico, son un puntero al estado del repo en el momento del commit al que apuntan. Esto es útil para marcar versiones o deploys
+
+Una etiqueta anotada es una parte de la historia del repo que no puede ser cambiada.
+
+###### Etiqueta Lightweight
+
+` git tag etiqueta_simple `
+
+###### Etiqueta anotada
+
+` git tag -a v1.0 -m ‘Version 1.0’ `
+
+###### Subir las etiquetas al repositorio remoto
+
+` git push origin --tags `
