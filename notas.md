@@ -50,7 +50,7 @@ Una vez creada, se puede asociar al usuario creado en GitHub (Bitbucket, Gitlab,
 
 ## Áreas
 
-    Hay 3 áreas principales:
+    Hay 4 áreas principales:
 
 ##### Archivos sin trackear
 
@@ -64,6 +64,9 @@ Archivos que han sido modificados, pero que aun no fueron commiteados
 
 Archivos modificados que han sido marcados para ir en el próximo commit.
 
+##### Directorio .git (repositorio)
+
+Base de datos donde se almacenan todas las versiones de todos los archivos que estemos trackeando
 
 ## Primeros Pasos
 
