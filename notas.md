@@ -22,6 +22,9 @@ En Git un commit es una revisión
 * Es fácil recuperar versiones
 * Sirve de Documentacion
 
+## Git Help
+git help <comando> muestra ayuda de un determinado <comando>
+
 ## Setup inicial
 
 ### Gitconfig
